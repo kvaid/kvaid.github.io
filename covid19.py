@@ -7,31 +7,37 @@ confirmed_filename = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/
 recovered_filename = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv"
 deaths_filename    = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv"
 
+countries_with_states = ['Australia','Canada','China','Denmark','France','Netherlands','United Kingdom','US']
+
+# def consolidate_countries()
+
 def format_df(input_file,output_file):
     input_df = pd.read_csv(input_file)
     input_df.rename(columns = {"Country/Region":"country","Province/State":"state"}, inplace = True)  # rename the columns
-    input_df.loc[input_df['state'].notnull(),'country'] = input_df['country'] + ' ' + input_df['state']
-    input_df = input_df.drop(['state','Lat','Long'], axis=1)
-    input_df = input_df.set_index('country')
-    output_df = input_df.T                                    # Transpose
-    output_df = output_df.reset_index()                             # add default indexing
+    input_df.loc[input_df['state'].notnull(),'country'] = input_df['country'] + ' ' + input_df['state'] # concat 'state' after 'country' only for columns which have non-null value for 'state'
+    input_df = input_df.drop(['state','Lat','Long'], axis=1)    # delete lat, long and state columns
+    input_df = input_df.set_index('country')                    # set new index to 'country' column
+    output_df = input_df.T                                      # Transpose
+    output_df = output_df.reset_index()                             # add back default indexing (0,1,2...n)
     output_df.columns = ['Date'] + list(output_df.columns)[1:]      # insert 'Date' as name for date column
-    output_df.to_csv("filename")
+    output_df.to_csv("filename.csv")
     return output_df
 
 dfc = format_df(confirmed_filename,"covid_confirmed.csv")
-dfr = format_df(recovered_filename,"covid_recovered.csv")
-dfd = format_df(deaths_filename,   "covid_deaths.csv")
 datecol = dfc['Date']   # extract date column and save it for reinsertion later
-del dfc['Date']
+del dfc['Date']  # subtracting dataframes (confirmed-recovered) requires removing 'Date' column since it is a string. we will add it back later.
+
+dfr = format_df(recovered_filename,"covid_recovered.csv")
 del dfr['Date']
-del dfd['Date']
+
 dft = dfc.subtract(dfr)
 dft.insert(loc=0, column='Date', value=datecol) # insert 'Date' column at the beginning
-dfd.insert(loc=0, column='Date', value=datecol) # insert 'Date' column at the beginning
 print(dft)
 dft.to_csv("covid_total.csv")
 
+#dfd = format_df(deaths_filename,"covid_deaths.csv")
+#del dfd['Date']
+#dfd.insert(loc=0, column='Date', value=datecol) # insert 'Date' column at the beginning
 
 # find top 5 countries with most cases
 #dft_index = dft.index[-1]
@@ -46,29 +52,30 @@ dft.to_csv("covid_total.csv")
 trace1 = go.Scatter(y = dft['Italy'],x = dft['Date'],mode = "lines",name = "Italy",text= "Italy")
 trace2 = go.Scatter(y = dft['Spain'],x = dft['Date'],mode = "lines",name = "Spain",text= "Spain")
 trace3 = go.Scatter(y = dft['Iran'], x = dft['Date'],mode = "lines",name = "Iran", text= "Iran")
-data = [trace1, trace2, trace3]
-layout = dict(title = 'Confirmed cases',yaxis= dict(title='Confirmed cases',ticklen=5,zeroline=False))
-fig = go.Figure(data = data, layout = layout)
-fig.show()
-
-# # show menu for selecting between linear and log scales
-# updatemenus = list([
-#     dict(active=1,
-#          buttons=list([
-#             dict(label='Log Scale',
-#                  method='update',
-#                  args=[{'visible': [True, True, True]},
-#                        {'title': 'Log scale',
-#                         'yaxis': {'type': 'log'}}]),
-#             dict(label='Linear Scale',
-#                  method='update',
-#                  args=[{'visible': [True, True, True]},
-#                        {'title': 'Linear scale',
-#                         'yaxis': {'type': 'linear'}}])
-#             ]),
-#         )
-#     ])
-
-# layout = dict(updatemenus=updatemenus, title='Linear scale')
-# fig = go.Figure(data=data, layout=layout)
+trace4 = go.Scatter(y = dft['China Hubei'], x = dft['Date'],mode = "lines",name = "China", text= "China")
+data = [trace1, trace2, trace3, trace4]
+#layout = dict(title = 'Total outstanding cases (confirmed - recovered)',yaxis= dict(title='Total outstanding',ticklen=5,zeroline=False))
+# fig = go.Figure(data = data, layout = layout)
 # fig.show()
+
+# show menu for selecting between linear and log scales
+updatemenus = list([
+    dict(active=1,
+         buttons=list([
+            dict(label='Log Scale',
+                 method='update',
+                 args=[{'visible': [True, True, True]},
+                       {'title': 'Log scale',
+                        'yaxis': {'type': 'log'}}]),
+            dict(label='Linear Scale',
+                 method='update',
+                 args=[{'visible': [True, True, True]},
+                       {'title': 'Linear scale',
+                        'yaxis': {'type': 'linear'}}])
+            ]),
+        )
+    ])
+
+layout = dict(updatemenus=updatemenus, title = 'Total outstanding cases (confirmed - recovered)',yaxis= dict(title='Total outstanding'))
+fig = go.Figure(data=data, layout=layout)
+fig.show()
