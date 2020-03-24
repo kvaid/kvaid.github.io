@@ -9,6 +9,7 @@ deaths_filename    = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/
 
 countries_with_states = ['Australia','Canada','China','Denmark','France','Netherlands','United Kingdom','US']
 
+<<<<<<< HEAD
 # def consolidate_countries()
 
 def format_df(input_file,output_file):
@@ -21,6 +22,19 @@ def format_df(input_file,output_file):
     output_df = output_df.reset_index()                             # add back default indexing (0,1,2...n)
     output_df.columns = ['Date'] + list(output_df.columns)[1:]      # insert 'Date' as name for date column
     output_df.to_csv("filename.csv")
+=======
+def format_df(input_file,output_file):
+    input_df = pd.read_csv(input_file)
+    input_df.rename(columns = {"Country/Region":"country","Province/State":"state"}, inplace = True)  # rename the columns
+    #input_df.loc[input_df['state'].notnull(),'country'] = input_df['country'] + ' ' + input_df['state']
+    input_df = input_df.drop(['state','Lat','Long'], axis=1)
+    input_df = input_df.set_index('country')
+    input_df = input_df.groupby('country').sum()
+    output_df = input_df.T                                    # Transpose
+    output_df = output_df.reset_index()                             # add default indexing
+    output_df.columns = ['Date'] + list(output_df.columns)[1:]      # insert 'Date' as name for date column
+    output_df.to_csv("covid_groupby.csv")
+>>>>>>> consolidate_country_data
     return output_df
 
 dfc = format_df(confirmed_filename,"covid_confirmed.csv")
@@ -35,10 +49,13 @@ dft.insert(loc=0, column='Date', value=datecol) # insert 'Date' column at the be
 print(dft)
 dft.to_csv("covid_total.csv")
 
+<<<<<<< HEAD
 #dfd = format_df(deaths_filename,"covid_deaths.csv")
 #del dfd['Date']
 #dfd.insert(loc=0, column='Date', value=datecol) # insert 'Date' column at the beginning
 
+=======
+>>>>>>> consolidate_country_data
 # find top 5 countries with most cases
 #dft_index = dft.index[-1]
 #dft_lastdate = dft['Date'].iloc[-1]
@@ -51,10 +68,17 @@ dft.to_csv("covid_total.csv")
 
 trace1 = go.Scatter(y = dft['Italy'],x = dft['Date'],mode = "lines",name = "Italy",text= "Italy")
 trace2 = go.Scatter(y = dft['Spain'],x = dft['Date'],mode = "lines",name = "Spain",text= "Spain")
+<<<<<<< HEAD
 trace3 = go.Scatter(y = dft['Iran'], x = dft['Date'],mode = "lines",name = "Iran", text= "Iran")
 trace4 = go.Scatter(y = dft['China Hubei'], x = dft['Date'],mode = "lines",name = "China", text= "China")
 data = [trace1, trace2, trace3, trace4]
 #layout = dict(title = 'Total outstanding cases (confirmed - recovered)',yaxis= dict(title='Total outstanding',ticklen=5,zeroline=False))
+=======
+trace3 = go.Scatter(y = dft['US'],   x = dft['Date'],mode = "lines",name = "US",   text= "US")
+trace4 = go.Scatter(y = dft['China'],x = dft['Date'],mode = "lines",name = "China",text= "China")
+data = [trace1, trace2, trace3, trace4]
+# layout = dict(title = 'Total cases (Confirmed minus Recovered)',yaxis= dict(title='Confirmed cases',ticklen=5,zeroline=False))
+>>>>>>> consolidate_country_data
 # fig = go.Figure(data = data, layout = layout)
 # fig.show()
 
@@ -64,18 +88,30 @@ updatemenus = list([
          buttons=list([
             dict(label='Log Scale',
                  method='update',
+<<<<<<< HEAD
                  args=[{'visible': [True, True, True]},
+=======
+                 args=[{'visible': [True, True, True,True]},
+>>>>>>> consolidate_country_data
                        {'title': 'Log scale',
                         'yaxis': {'type': 'log'}}]),
             dict(label='Linear Scale',
                  method='update',
+<<<<<<< HEAD
                  args=[{'visible': [True, True, True]},
+=======
+                 args=[{'visible': [True, True, True,True]},
+>>>>>>> consolidate_country_data
                        {'title': 'Linear scale',
                         'yaxis': {'type': 'linear'}}])
             ]),
         )
     ])
 
+<<<<<<< HEAD
 layout = dict(updatemenus=updatemenus, title = 'Total outstanding cases (confirmed - recovered)',yaxis= dict(title='Total outstanding'))
+=======
+layout = dict(updatemenus=updatemenus, title = 'Total cases (Confirmed minus Recovered)',yaxis= dict(title='Confirmed cases',ticklen=5,zeroline=False))
+>>>>>>> consolidate_country_data
 fig = go.Figure(data=data, layout=layout)
 fig.show()
