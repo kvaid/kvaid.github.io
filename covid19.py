@@ -22,10 +22,10 @@ def format_df(input_file,output_file):
     output_df.to_csv("covid_groupby.csv")
     return output_df
 
-def plotcharts(input_df,topn):
+def plotcharts(input_df,numcountries,dropdownoption):
     data = []
     k = 0
-    dft_topn = input_df.drop(['Date'],axis=1).sort_values(by=60,axis=1,ascending=False).iloc[:,0:topn]
+    dft_topn = input_df.drop(['Date'],axis=1).sort_values(by=60,axis=1,ascending=False).iloc[:,0:numcountries]
     topn_countries = list(dft_topn.columns)
     dft_topn.insert(loc=0, column='Date', value=datecol) # insert 'Date' column at the beginning
     print(dft_topn,topn_countries)
@@ -38,29 +38,31 @@ def plotcharts(input_df,topn):
         data.append(temptrace)
         k += 1
 
-    # layout = dict(title = 'Total cases (Confirmed minus Recovered)',yaxis= dict(title='Confirmed cases',ticklen=5,zeroline=False))
-    # fig = go.Figure(data = data, layout = layout)
-    # fig.show()
+    if menuoption:
+        # show menu for selecting between linear and log scales
+        updatemenus = list([dict(active=1,
+                                buttons=list([dict(label='Log Scale',   method='update',args=[{'title': 'Log scale',   'yaxis': {'type': 'log'}}]),
+                                              dict(label='Linear Scale',method='update',args=[{'title': 'Linear scale','yaxis': {'type': 'linear'}}])
+                                #buttons=list([dict(label='Log Scale',    method='update',args=[{'visible': [True, True, True, True]}, {'title': 'Log scale','yaxis': {'type': 'log'}}]),
+                                #              dict(label='Linear Scale', method='update',args=[{'visible': [True, True, True, True]}, {'title': 'Linear scale','yaxis': {'type': 'linear'}}])
+                                            ]),
+                                )
+                            ])
+    else:
+        updatemenus = []    # no selectable menus
 
-    # show menu for selecting between linear and log scales
-    updatemenus = list([
-        dict(active=1,
-            buttons=list([
-                dict(label='Log Scale',
-                    method='update',
-                        args=[{'visible': [True, True, True, True]},
-                            {'title': 'Log scale',
-                            'yaxis': {'type': 'log'}}]),
-                dict(label='Linear Scale',
-                    method='update',
-                    args=[{'visible': [True, True, True, True]},
-                            {'title': 'Linear scale',
-                            'yaxis': {'type': 'linear'}}])
-            ]),
-        )
-    ])
+    layout = dict(updatemenus=updatemenus,
+                  title = 'Total cases (Confirmed minus Recovered)',
+                  xaxis = dict(rangeselector=dict(buttons=list([dict(count=1, label="1m",  step="month", stepmode="backward"),
+                                                                dict(count=2, label="2m",  step="month", stepmode="backward"),
+                                                                dict(count=1, label="YTD", step="year",  stepmode="todate"),
+                                                                dict(step="all")
+                                                                ])
+                                                ),
+                                rangeslider=dict(visible=True),
+                                ),
+                  yaxis = dict(title='Confirmed cases',ticklen=5,zeroline=False))
 
-    layout = dict(updatemenus=updatemenus, title = 'Total cases (Confirmed minus Recovered)',yaxis= dict(title='Confirmed cases',ticklen=5,zeroline=False))
     fig = go.Figure(data=data, layout=layout)
     fig.show()
 
@@ -82,5 +84,5 @@ del dfd['Date']
 dfd.insert(loc=0, column='Date', value=datecol) # insert 'Date' column at the beginning
 
 # find top n countries with most cases and plot charts
-plotcharts(dft,5)
+plotcharts(dft,7,False)
 
