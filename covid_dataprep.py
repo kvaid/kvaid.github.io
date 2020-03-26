@@ -1,16 +1,18 @@
 import pandas as pd
 
 
-input_file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
-countries_with_states = ['Australia','Canada','China','Denmark','France','Netherlands','United Kingdom','US']
+input_file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/03-24-2020.csv"
 
-input_df = pd.read_csv(input_file)
-input_df.rename(columns = {"Country/Region":"country","Province/State":"state"}, inplace = True)  # rename the columns
-input_df = input_df.drop(['state','Lat','Long'], axis=1)
-input_df = input_df.set_index('country')
-input_df = input_df.groupby('country').sum()
+in_df = pd.read_csv(input_file)
+in_df.rename(columns = {"Admin2":"County","Country_Region":"Country","Province_State":"State","Last_Update":"Date","Long_":"Long","Combined_Key":"Location"}, inplace = True)  # rename the columns
 
-output_df = input_df.T                                    # Transpose
-output_df = output_df.reset_index()                             # add default indexing
-output_df.columns = ['Date'] + list(output_df.columns)[1:]      # insert 'Date' as name for date column
-output_df.to_csv("covid_groupby.csv")
+#in_df = in_df.drop(['state','Lat','Long'], axis=1)
+#in_df = in_df.set_index('country')
+#in_df = in_df.groupby('country').sum
+
+#out_df = in_df.T                                    # Transpose
+#out_df = out_df.reset_index()                             # add default indexing
+#out_df.columns = ['Date'] + list(out_df.columns)[1:]      # insert 'Date' as name for date column
+#out_df.to_csv("covid_groupby.csv")
+
+print(in_df.head(10))
