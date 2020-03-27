@@ -9,12 +9,10 @@ deaths_filename          = "https://raw.githubusercontent.com/CSSEGISandData/COV
 
 countries_with_states = ['Australia','Canada','China','Denmark','France','Netherlands','United Kingdom','US']
 
-def format_df(input_file,output_file,usviews):
+def format_df(input_file,output_file):
     in_df = pd.read_csv(input_file)
     in_df.rename(columns = {"Country/Region":"country","Province/State":"state"}, inplace = True)  # rename the columns
     #in_df.loc[in_df['state'].notnull(),'country'] = in_df['country'] + ' ' + in_df['state']
-    
-    in_df = in_df.loc[in_df['country']=='US']
     in_df = in_df.drop(['state','Lat','Long'], axis=1)
     in_df = in_df.set_index('country')
     in_df = in_df.groupby('country').sum()
@@ -70,14 +68,14 @@ def plotcharts(in_df,topn,dropdown):
 
 ########################################################################################################################
 
-dfc_global = format_df(confirmed_cases_filename,"covid_confirmed_global.csv",usviews=False)
+dfc_global = format_df(confirmed_cases_filename,"covid_confirmed_global.csv")
 datecol = dfc_global['Date']   # extract date column and save it for reinsertion later
 del dfc_global['Date']         # subtracting dataframes (confirmed-recovered) requires removing 'Date' column since it is a string. we will add it back later.
 
 #dfr = format_df(recovered_cases_filename,"covid_recovered.csv")
 #del dfr['Date']
 
-dfd_global = format_df(deaths_filename,"covid_deaths_global.csv",usviews=False)
+dfd_global = format_df(deaths_filename,"covid_deaths_global.csv")
 del dfd_global['Date']
 
 #df_global = dfc.subtract(dfr)     # Total = Confirmed - Recovered - Deaths
