@@ -5,20 +5,20 @@ with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-c
 
 import pandas as pd
 import plotly.express as px
+import datetime as dt
 
-input_file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/03-26-2020.csv"
+input_file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/03-28-2020.csv"
 
-df = pd.read_csv(input_file)
+current_date = dt.datetime.today().strftime ('%Y-%m-%d')
+print(current_date)
 
-# df.rename(columns = {"Admin2":"County","Country_Region":"Country","Province_State":"State","Last_Update":"Date","Long_":"Long","Combined_Key":"Location"}, inplace = True)  # rename the columns
-# # process the 'Date' column to remove the H:M:S timestamp and just represent as "YYYY-MM-DD"
-# df['Date'] = pd.to_datetime(df['Date'])   # after this, the 'Date' column is of type <pandas._libs.tslibs.timestamps.Timestamp>
-# df['Date'] = df['Date'].map(lambda ts: ts.strftime("%d-%m-%Y")) # after this, the 'Date' column is of type <Str>
-# df['Date'] = pd.to_datetime(df['Date'])   # after this, the 'Date' column is of type <pandas._libs.tslibs.timestamps.Timestamp>
+df = pd.read_csv(input_file,dtype={"FIPS":str,'Confirmed':int})
 
-# # format FIPS column as int
-# df['FIPS'] = df['FIPS'].fillna(0.0).astype(int)
-
+df.rename(columns = {"Admin2":"County","Country_Region":"Country","Province_State":"State","Last_Update":"Date","Long_":"Long","Combined_Key":"Location"}, inplace = True)  # rename the columns
+# process the 'Date' column to remove the H:M:S timestamp and just represent as "YYYY-MM-DD"
+df['Date'] = pd.to_datetime(df['Date'])   # after this, the 'Date' column is of type <pandas._libs.tslibs.timestamps.Timestamp>
+df['Date'] = df['Date'].map(lambda ts: ts.strftime("%d-%m-%Y")) # after this, the 'Date' column is of type <Str>
+df['Date'] = pd.to_datetime(df['Date'])   # after this, the 'Date' column is of type <pandas._libs.tslibs.timestamps.Timestamp>
 
 # # add sum for confirmed, recovered, deaths, active for every state
 # list_columns = ['Confirmed','Recovered','Deaths','Active']
@@ -31,24 +31,30 @@ df = pd.read_csv(input_file)
 # print(df_us.head())
 
 # # retain only US states, drop other countries
-df = df.loc[df['Country_Region']=='US']
-df['FIPS'] = df['FIPS'].fillna(0.0).astype(int)
-df['FIPS'] = df['FIPS'].fillna(0.0).astype(str)
+df = df.loc[df['Country']=='US']
+#df['FIPS'] = df['FIPS'].fillna(0.0).astype(int)
+#df['FIPS'] = df['FIPS'].fillna(0.0).astype(str)
 df['FIPS'] = df['FIPS'].map(lambda x: str(x).zfill(5)) 
-df['Confirmed'] = df['Confirmed'].fillna(0.0).astype(int)
+df['Confirmed'] = df['Confirmed'].fillna(0.0)
 
-df_us = df[['FIPS','Confirmed','Combined_Key']].copy()
+df_us = df[['Date','FIPS','Confirmed','Location']].copy()
 df_us.to_csv("covid_fips.csv")
+print(df_us.head())
 
-fig = px.choropleth_mapbox(df_us, geojson=counties, locations='FIPS', color='Confirmed',
-                           color_continuous_scale="Bluered",
-                           range_color=(0,100),
-                           mapbox_style="carto-positron",
-                           zoom=3, center = {"lat": 37.0902, "lon": -95.7129},
-                           opacity=0.5,
-                           hover_name=df_us['Combined_Key'],
-                           hover_data=["Confirmed"],
-                           labels={'Confirmed':'Confirmed cases'}
-                          )
+fig = px.choropleth_mapbox(df_us, 
+                geojson=counties, 
+                locations='FIPS', 
+                color='Confirmed',
+                color_continuous_scale="Bluered",
+                range_color=(0,100),
+                mapbox_style="carto-positron",
+                zoom=3, 
+                center = {"lat": 37.0902, "lon": -95.7129},
+                opacity=0.5,
+                hover_name=df_us['Location'],
+                hover_data=["Confirmed"],
+                labels={'Confirmed':'Confirmed cases'}
+                )
+                
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 fig.show()
