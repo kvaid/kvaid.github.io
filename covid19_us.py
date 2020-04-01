@@ -60,9 +60,9 @@ while (prev_date >= start_date):
 
 df_us = df_us.sort_values(['FIPS','Date'], ascending=[True,True])
 
-df_us = df_us.loc[df_us['State'].isin(['Washington','New York','California','Florida','Louisiana','Michigan','Massachussets','Illinois'])] # retain only specific US states, drop other countries
+#df_us = df_us.loc[df_us['State'].isin(['Washington','New York','California','Florida','Louisiana','Michigan','Massachussets','Illinois'])] # retain only specific US states, drop other countries
 
-df_us.to_csv("covid_fips.csv")
+df_us.to_csv("output/covid19_us_counties_JHU_CSSE.csv")
 
 fig = px.choropleth_mapbox(df_us, 
                 title="Progression on COVID-19 cases across US counties",

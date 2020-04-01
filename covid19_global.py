@@ -23,7 +23,7 @@ def format_df(input_file,output_file):
     #out_df['Date'] =  pd.to_datetime(out_df['Date'], format='%m/%d/%y') # convert 'Date' column to datefield data structure
     out_df['Date']  = out_df['Date'].apply(lambda x: dt.datetime.strptime(x,'%m/%d/%y'))
     print(out_df['Date'].head())
-    out_df.to_csv("covid_groupby.csv")
+    out_df.to_csv("output/covid_groupby.csv")
     return out_df
 
 def plotcharts(in_df,topn,dropdown):
