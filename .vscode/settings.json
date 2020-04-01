@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\kusha\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe"
+    "python.pythonPath": "d:\\kusha\\OneDrive\\Projects\\source\\python\\covid19\\.venv\\Scripts\\python.exe",
+    "git.ignoreLimitWarning": true
 }
