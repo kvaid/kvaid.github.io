@@ -28,8 +28,8 @@ df['date'] = df['date'].map(lambda x: x.strftime("%m-%d-%Y")) # convert to strin
 
 df['fips'] = df['fips'].fillna("0").map(lambda x: str(x).zfill(5)) # if no FIPS code then use "0" and then format FIPS string to 5 digits
 df.loc[df['county']=='New York City','fips'] = "36061" # select rows that match "New York City" for 'county' column, and replace all 'fips' column values with "36061"
-df = df[df['cases'] > 50] # retain only rows with 'cases' greater than 10
-df = df.reset_index()
+df = df[df['cases'] > 52] # retain only rows with 'cases' greater than 10
+#df = df.reset_index()
 
 df.to_csv("output/covid19_us_counties_nytimes.csv")
 
@@ -44,17 +44,17 @@ fig = px.choropleth_mapbox(df,
                 color_continuous_scale="Reds",
                 range_color=(0,1000),
                 mapbox_style="carto-positron", # stamen-watercolor,stamen-terrain,carto-positron
-                zoom=4.25, center = {"lat": 37.0902, "lon": -95.7129}, # for continental US
+                zoom=4.5, center = {"lat": 37.0902, "lon": -95.7129}, # for continental US
                 #zoom=7,center = {"lat": 47.75, "lon": -120.75}, # for Washington state
                 opacity=0.5,
                 hover_name=df['county'],
-                hover_data=['cases'],
-                labels={'cases':'Confirmed cases'},
+                #hover_data=['cases'],
+                #labels={'cases':'Confirmed cases'},
                 animation_frame='date', # column name to show range of animation frame
                 animation_group='fips' # column name that is constant across animation_frame data
                 )
                 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 #fig.show()
-fig.write_html('covid19_us.html', auto_open=True)
+fig.write_html('index.html', auto_open=True)
 
