@@ -28,7 +28,7 @@ df['date'] = df['date'].map(lambda x: x.strftime("%m-%d-%Y")) # convert to strin
 
 df['fips'] = df['fips'].fillna("0").map(lambda x: str(x).zfill(5)) # if no FIPS code then use "0" and then format FIPS string to 5 digits
 df.loc[df['county']=='New York City','fips'] = "36061" # select rows that match "New York City" for 'county' column, and replace all 'fips' column values with "36061"
-df = df[df['cases'] > 52] # retain only rows with 'cases' greater than 10
+df = df[df['cases'] > 40] # retain only rows with 'cases' greater than 10
 #df = df.reset_index()
 
 df.to_csv("output/covid19_us_counties_nytimes.csv")
