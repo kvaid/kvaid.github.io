@@ -56,5 +56,5 @@ fig = px.choropleth_mapbox(df,
                 
 fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 fig.show()
-#fig.write_html('index.html', auto_open=True)
+fig.write_html('index.html', auto_open=True)
 
